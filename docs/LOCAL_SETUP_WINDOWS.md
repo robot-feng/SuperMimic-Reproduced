@@ -63,7 +63,7 @@ uv run sm-train --run-name local-smoke --data.npz-dir data/npz/lafan1 --data.lim
 这是缩小后的管线检查，不是论文结果。全量 BONES-SEED 紧凑动作库约 6.7 GB 且常驻显存，RTX 5060 的 8 GB 显存不能同时容纳它和训练状态。当前机器已下载并转换完整的 40 条 LAFAN1（2.451 小时），可用下面的显存缩放配置做完整数据集训练；它与论文的 4096 环境正式设置不等价，结果应按本机单卡配置报告：
 
 ```powershell
-uv run sm-train --run-name lafan1-rtx5060-final --log-root logs --data.npz-dir data/npz/lafan1 `
+uv run sm-train --run-name lafan1-rtx5060-512e1536b2048wm --log-root logs --data.npz-dir data/npz/lafan1 `
   --env.num-envs 512 `
   --wm-trainer.batch-size 2048 --wm-trainer.compile None `
   --policy-trainer.batch-size 1536 --policy-trainer.horizon 32 --policy-trainer.compile None `
