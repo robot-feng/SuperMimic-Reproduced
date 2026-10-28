@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+/logs/
+/data/
+/media/*.gif
+/media/*.mp4
+wandb/
+*.npz
+*.pt
+*.onnx
+.pytest_cache/
+.ruff_cache/
+experiments/**/outputs/
