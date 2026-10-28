@@ -60,7 +60,17 @@ uv run sm-train --run-name local-smoke --data.npz-dir data/npz/lafan1 --data.lim
   --schedule.log-interval 10 --schedule.checkpoint-interval 100
 ```
 
-这是缩小后的管线检查，不是论文结果。正式设置使用 4096 个环境；BONES-SEED 紧凑动作库约 6.7 GB 且常驻显存，RTX 5060 的 8 GB 显存不能同时容纳它和训练状态。先用 1 个 LAFAN1 片段、64 个环境；确认可运行后再逐步扩大环境数，并记录显存峰值。不要把这组小规模结果称作全量复现。
+这是缩小后的管线检查，不是论文结果。全量 BONES-SEED 紧凑动作库约 6.7 GB 且常驻显存，RTX 5060 的 8 GB 显存不能同时容纳它和训练状态。当前机器已下载并转换完整的 40 条 LAFAN1（2.451 小时），可用下面的显存缩放配置做完整数据集训练；它与论文的 4096 环境正式设置不等价，结果应按本机单卡配置报告：
+
+```powershell
+uv run sm-train --run-name lafan1-rtx5060 --log-root logs --data.npz-dir data/npz/lafan1 `
+  --env.num-envs 128 `
+  --wm-trainer.batch-size 128 --wm-trainer.compile None `
+  --policy-trainer.batch-size 256 --policy-trainer.horizon 32 --policy-trainer.compile None `
+  --schedule.max-hours 3 --schedule.log-interval 50 --schedule.checkpoint-interval 2000
+```
+
+这个配置保留完整 LAFAN1、默认网络宽度和 32 步想象视野，只缩小并行环境与批量大小；不会把这组结果称作论文硬件配置下的复现。
 
 ## Linux / WSL 备选
 
