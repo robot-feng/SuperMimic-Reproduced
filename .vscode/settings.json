@@ -4,6 +4,7 @@
     "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
     "terminal.integrated.env.windows": {
         "UV_CACHE_DIR": "D:\\MinicondaEnv\\uv-cache",
-        "WARP_CACHE_PATH": "D:\\MinicondaEnv\\warp-cache"
+        "WARP_CACHE_PATH": "D:\\MinicondaEnv\\warp-cache",
+        "TORCHINDUCTOR_CACHE_DIR": "D:\\MinicondaEnv\\torchinductor-cache"
     }
 }

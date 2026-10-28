@@ -4,19 +4,20 @@
 
 本机项目环境是仓库根目录下的 `.venv`（Python 3.12.13）；使用项目自己的 Python 和 `uv`。Conda 的 `mjlab` 环境是另一套环境，当前检查为 Python 3.10.18、torch 2.12.1+cu130，且缺少本仓库的 MuJoCo/Warp 等依赖，因此不适用于 SuperMimic。保留它，不要复制或原地升级。
 
-在 PowerShell 中进入仓库根目录，并先将 uv 下载缓存与 Warp kernel 缓存指到 D 盘。示例使用 `D:\MinicondaEnv\uv-cache` 和 `D:\MinicondaEnv\warp-cache`，也可以改成其他 D 盘目录：
+在 PowerShell 中进入仓库根目录，并先将 uv 下载缓存、Warp kernel 缓存和 TorchInductor 编译缓存指到 D 盘。示例使用 `D:\MinicondaEnv\uv-cache`、`D:\MinicondaEnv\warp-cache` 和 `D:\MinicondaEnv\torchinductor-cache`，也可以改成其他 D 盘目录：
 
 ```powershell
 cd D:\PycharmProjects\SuperMimic
 $env:UV_CACHE_DIR = "D:\MinicondaEnv\uv-cache"
 $env:WARP_CACHE_PATH = "D:\MinicondaEnv\warp-cache"
-New-Item -ItemType Directory -Force -Path $env:UV_CACHE_DIR, $env:WARP_CACHE_PATH | Out-Null
+$env:TORCHINDUCTOR_CACHE_DIR = "D:\MinicondaEnv\torchinductor-cache"
+New-Item -ItemType Directory -Force -Path $env:UV_CACHE_DIR, $env:WARP_CACHE_PATH, $env:TORCHINDUCTOR_CACHE_DIR | Out-Null
 uv cache dir
 .\.venv\Scripts\python.exe --version
 uv sync --group dev
 ```
 
-`UV_CACHE_DIR` 控制 uv 下载缓存，`WARP_CACHE_PATH` 控制 Warp 编译 kernel 的缓存（本机此前默认写入 C 盘）。`uv sync` 会在当前项目的 `.venv` 中安装 `uv.lock` 锁定的依赖。如果安装中断，设置好 D 盘缓存后重新运行 `uv sync --group dev`。依赖量较大，安装完成后确认 CUDA、MuJoCo 和 Warp 可用：
+`UV_CACHE_DIR` 控制 uv 下载缓存，`WARP_CACHE_PATH` 控制 Warp kernel 缓存，`TORCHINDUCTOR_CACHE_DIR` 控制 `torch.compile` 的编译缓存（本机默认会写入 C 盘）。`uv sync` 会在当前项目的 `.venv` 中安装 `uv.lock` 锁定的依赖。如果安装中断，设置好 D 盘缓存后重新运行 `uv sync --group dev`。依赖量较大，安装完成后确认 CUDA、MuJoCo 和 Warp 可用：
 
 ```powershell
 uv run python -c "import torch, mujoco, warp, mjlab; print('Torch/CUDA:', torch.__version__, torch.version.cuda, torch.cuda.is_available()); print('GPU:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'unavailable'); print('MuJoCo/Warp:', mujoco.__version__, warp.__version__)"
