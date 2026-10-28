@@ -65,8 +65,8 @@ uv run sm-train --run-name local-smoke --data.npz-dir data/npz/lafan1 --data.lim
 ```powershell
 uv run sm-train --run-name lafan1-rtx5060-8gb --log-root logs --data.npz-dir data/npz/lafan1 `
   --env.num-envs 640 `
-  --wm-trainer.batch-size 1024 --wm-trainer.compile None `
-  --policy-trainer.batch-size 1024 --policy-trainer.horizon 32 --policy-trainer.compile None `
+  --wm-trainer.batch-size 2048 --wm-trainer.compile None `
+  --policy-trainer.batch-size 1536 --policy-trainer.horizon 32 --policy-trainer.compile None `
   --schedule.max-hours 3 --schedule.log-interval 50 --schedule.checkpoint-interval 500
 ```
 
