@@ -59,13 +59,14 @@ class PolicyTrainer:
         feat = self.wm.spec.canonical(ro.states.reshape(H1 * n, -1)).reshape(H1, n, -1)
         return feat, ro.goals, ro.e_root
 
-    def update(self, buffer: ReplayBuffer, xi_norm_fn=None) -> dict[str, float]:
+    def update(self, buffer: ReplayBuffer, xi_norm_fn=None) -> dict[str, torch.Tensor | float]:
         cfg = self.cfg
         profile = cfg.profile_timing
         if profile:
             torch.cuda.synchronize()
             t_phase = time.perf_counter()
-        start = buffer.sample_starts(cfg.batch_size, cfg.history)
+        # Updates begin after warmup, so valid starts are guaranteed and no host sync is needed.
+        start = buffer.sample_starts(cfg.batch_size, cfg.history, check_nonempty=False)
         xi_norm = self.wm.spec.normalize_xi(start.xi)
 
         # ---- actor: BPTT through the frozen world model ------------------------------------
@@ -96,21 +97,17 @@ class PolicyTrainer:
             actor_s = time.perf_counter() - t_phase
             t_phase = time.perf_counter()
 
-        metrics = {
-            "imag_objective": float(J.detach()),
-            "imag_return_undisc": float((ro.survival[:-1] * ro.rewards).sum(0).mean().detach()),
-            "imag_reward_mean": float(ro.rewards.mean().detach()),
-            "imag_survival_H": float(ro.survival[-1].mean().detach()),
-            "imag_dhat_mean": float(ro.dhat[1:].mean().detach()),
-            "policy_grad_norm": float(gn),
-            "action_abs_mean": float(ro.actions.abs().mean().detach()),
+        metric_tensors = {
+            "imag_objective": J.detach(),
+            "imag_return_undisc": (ro.survival[:-1] * ro.rewards).sum(0).mean().detach(),
+            "imag_reward_mean": ro.rewards.mean().detach(),
+            "imag_survival_H": ro.survival[-1].mean().detach(),
+            "imag_dhat_mean": ro.dhat[1:].mean().detach(),
+            "policy_grad_norm": gn.detach(),
+            "action_abs_mean": ro.actions.abs().mean().detach(),
         }
-        if profile:
-            metrics["time_imagine_s"] = imagine_s
-            metrics["time_actor_s"] = actor_s
-            metrics["time_critic_s"] = 0.0
         for k, v in ro.reward_terms.items():
-            metrics[f"imag_r/{k}"] = v
+            metric_tensors[f"imag_r/{k}"] = v.detach()
 
         # ---- critic: fit to GAE targets of this rollout (targets fixed) ---------------------
         if cfg.use_critic:
@@ -140,10 +137,17 @@ class PolicyTrainer:
                     torch.nn.utils.clip_grad_norm_(self.critic.parameters(), cfg.critic_grad_clip)
                     self.critic_opt.step()
                     last = closs.detach()
-            metrics["critic_loss"] = float(last)
-            metrics["critic_value_mean"] = float(values.mean())
-            metrics["critic_target_mean"] = float(targets.mean())
+            metric_tensors["critic_loss"] = last.detach()
+            metric_tensors["critic_value_mean"] = values.mean().detach()
+            metric_tensors["critic_target_mean"] = targets.mean().detach()
         if profile:
             torch.cuda.synchronize()
-            metrics["time_critic_s"] = time.perf_counter() - t_phase
+            critic_s = time.perf_counter() - t_phase
+        # Keep tensor diagnostics on-device; the training loop transfers the whole
+        # logging window at once instead of synchronizing after every policy update.
+        metrics: dict[str, torch.Tensor | float] = metric_tensors
+        if profile:
+            metrics["time_imagine_s"] = imagine_s
+            metrics["time_actor_s"] = actor_s
+            metrics["time_critic_s"] = critic_s
         return metrics

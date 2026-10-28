@@ -112,17 +112,26 @@ class ReplayBuffer:
         return ok
 
     @torch.no_grad()
-    def _sample_from_mask(self, mask: torch.Tensor, n: int) -> tuple[torch.Tensor, torch.Tensor]:
+    def _sample_from_mask(
+        self, mask: torch.Tensor, n: int, *, check_nonempty: bool = True
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         flat = mask.reshape(-1)
-        total = int(flat.sum().item())
-        if total == 0:
+        if check_nonempty and int(flat.sum().item()) == 0:
             raise RuntimeError("replay buffer has no sampleable rows yet")
         idx = torch.multinomial(flat.float(), n, replacement=True)
         return idx // self.T, idx % self.T
 
     @torch.no_grad()
-    def sample_windows(self, n: int, k: int) -> WindowBatch:
-        e, t = self._sample_from_mask(self.window_mask(k), n)
+    def sample_windows(
+        self,
+        n: int,
+        k: int,
+        *,
+        check_nonempty: bool = True,
+        window_mask: torch.Tensor | None = None,
+    ) -> WindowBatch:
+        mask = self.window_mask(k) if window_mask is None else window_mask
+        e, t = self._sample_from_mask(mask, n, check_nonempty=check_nonempty)
         offs = torch.arange(k + 1, device=self.device)
         tt = (t[None, :] + offs[:, None]) % self.T  # (k+1, n)
         ee = e[None, :].expand(k + 1, n)
@@ -137,12 +146,12 @@ class ReplayBuffer:
         )
 
     @torch.no_grad()
-    def sample_starts(self, n: int, hist: int) -> StartBatch:
+    def sample_starts(self, n: int, hist: int, *, check_nonempty: bool = True) -> StartBatch:
         mask = self.valid & ~self.terminal
         t_idx = torch.arange(self.T, device=self.device)[None, :]
         dist_to_ptr = (self.ptr[:, None] - t_idx - 1) % self.T
         mask &= dist_to_ptr < self.T - hist - 1  # keep history rows from being overwritten underneath
-        e, t = self._sample_from_mask(mask, n)
+        e, t = self._sample_from_mask(mask, n, check_nonempty=check_nonempty)
         offs = torch.arange(hist, device=self.device) - (hist - 1)  # -(hist-1) .. 0
         tt = (t[None, :] + offs[:, None]) % self.T  # (hist, n)
         ee = e[None, :].expand(hist, n)

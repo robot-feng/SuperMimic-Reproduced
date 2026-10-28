@@ -49,10 +49,19 @@ class WorldModelTrainer:
         refs = [ReferenceFrame(None, None, None, None, r.root_pos_w[j * n : (j + 1) * n], r.root_quat_w[j * n : (j + 1) * n]) for j in range(k)]
         return self.wm.window_loss(w.states, w.a_exec, w.xi, w.done, refs)
 
-    def update(self, buffer: ReplayBuffer) -> dict[str, float]:
+    def update(self, buffer: ReplayBuffer) -> dict[str, torch.Tensor]:
         agg: dict[str, torch.Tensor] = {}
+        # The simulator does not append replay rows during this update, so all
+        # minibatches share the same valid-window mask. Build its rolled mask once.
+        sample_mask = buffer.window_mask(self.cfg.window)
         for _ in range(self.cfg.batches_per_update):
-            w = buffer.sample_windows(self.cfg.batch_size, self.cfg.window)
+            # Training starts after warmup has filled enough rows for every window.
+            w = buffer.sample_windows(
+                self.cfg.batch_size,
+                self.cfg.window,
+                check_nonempty=False,
+                window_mask=sample_mask,
+            )
             loss, m = self.loss_on(w)
             self.opt.zero_grad(set_to_none=True)
             loss.backward()
@@ -63,11 +72,12 @@ class WorldModelTrainer:
             m["grad_norm"] = gn.detach()
             for k, v in m.items():
                 agg[k] = agg.get(k, 0.0) + v
-        # Single host sync per update (keeps the CPU queuing GPU work across minibatches).
-        return {k: float(v) / self.cfg.batches_per_update for k, v in agg.items()}
+        # Keep diagnostics on-device. The loop transfers one aggregated log window
+        # after several updates instead of blocking the CPU after each update.
+        return {k: v / self.cfg.batches_per_update for k, v in agg.items()}
 
     @torch.no_grad()
     def online_error(self, buffer: ReplayBuffer, n: int = 1024, k: int = 8) -> torch.Tensor:
         """k-step open-loop error on (recent) replay windows; (k,) tensor."""
-        w = buffer.sample_windows(n, k)
+        w = buffer.sample_windows(n, k, check_nonempty=False)
         return self.wm.rollout_error(w.states, w.a_exec, w.xi)

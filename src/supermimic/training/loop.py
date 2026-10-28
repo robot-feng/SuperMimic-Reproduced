@@ -151,31 +151,37 @@ class Trainer:
         env = self.env
         obs, _ = env.reset()
         t_start = time.time()
+        profile_timing = cfg.policy_trainer.profile_timing
         timers = {"sim": 0.0, "wm": 0.0, "policy": 0.0}
-        agg: dict[str, float] = {}
+        agg: dict[str, torch.Tensor | float] = {}
         agg_n = 0
-        finished_returns: list[float] = []
-        finished_lens: list[float] = []
+        # Keep episode summaries on-device. Dynamic indexing plus .tolist() here used to
+        # synchronize the GPU on every environment step, even when only a few envs ended.
+        finished_return_sum = torch.zeros((), device=self.device)
+        finished_return_count = torch.zeros((), device=self.device)
+        finished_len_sum = torch.zeros((), device=self.device)
         last_log = time.time()
 
         while self.iteration < sch.total_iterations:
             # ---------------- (1) collect one vectorised env step
-            t0 = time.perf_counter()
+            if profile_timing:
+                t0 = time.perf_counter()
             action = self.act(obs)
             obs, rew, term, tout, extras = env.step(action)
             self.ep_reward_sum += rew
             self.ep_len += 1
             done = term | tout
-            if done.any():
-                ids = done.nonzero().squeeze(-1)
-                lens = self.ep_len[ids]
-                norm_ret = self.ep_reward_sum[ids] / (self.max_step_reward * lens.clamp_min(1))
-                finished_returns.extend(norm_ret.tolist())
-                finished_lens.extend(lens.tolist())
-                self.ep_reward_sum[ids] = 0.0
-                self.ep_len[ids] = 0.0
-            torch.cuda.synchronize()
-            timers["sim"] += time.perf_counter() - t0
+            done_f = done.to(dtype=self.ep_len.dtype)
+            norm_ret = self.ep_reward_sum / (self.max_step_reward * self.ep_len.clamp_min(1))
+            finished_return_sum += (norm_ret * done_f).sum()
+            finished_return_count += done_f.sum()
+            finished_len_sum += (self.ep_len * done_f).sum()
+            self.ep_reward_sum.masked_fill_(done, 0.0)
+            self.ep_len.masked_fill_(done, 0.0)
+            if profile_timing:
+                # Exact stage timings intentionally synchronize; keep this diagnostic-only.
+                torch.cuda.synchronize()
+                timers["sim"] += time.perf_counter() - t0
             self.iteration += 1
 
             # ---------------- (2)+(3) updates at the configured update-to-data ratio
@@ -186,15 +192,18 @@ class Trainer:
                     lr = cosine_lr(self.iteration, sch.total_iterations, cfg.wm_trainer.lr, sch.lr_final_ratio, sch.lr_decay_fraction)
                     self.wm_trainer.set_lr(lr)
                     self.policy_trainer.set_lr(lr * cfg.policy_trainer.lr / cfg.wm_trainer.lr)
-                    t0 = time.perf_counter()
+                    if profile_timing:
+                        t0 = time.perf_counter()
                     m_wm = self.wm_trainer.update(self.buffer)
-                    torch.cuda.synchronize()
-                    timers["wm"] += time.perf_counter() - t0
-                    t0 = time.perf_counter()
+                    if profile_timing:
+                        torch.cuda.synchronize()
+                        timers["wm"] += time.perf_counter() - t0
+                        t0 = time.perf_counter()
                     for _ in range(sch.policy_updates_per_wm_update):
                         m_pi = self.policy_trainer.update(self.buffer)
-                    torch.cuda.synchronize()
-                    timers["policy"] += time.perf_counter() - t0
+                    if profile_timing:
+                        torch.cuda.synchronize()
+                        timers["policy"] += time.perf_counter() - t0
                     self.num_updates += 1
                     for k, v in m_wm.items():
                         agg[f"wm/{k}"] = agg.get(f"wm/{k}", 0.0) + v
@@ -207,27 +216,38 @@ class Trainer:
             if self.iteration % sch.log_interval == 0:
                 it = self.iteration
                 elapsed = time.time() - t_start
+                # Transfer all four counters together once per log window rather than
+                # materializing a Python list of every completed episode each step.
+                return_sum, return_count, len_sum = torch.stack(
+                    [finished_return_sum, finished_return_count, finished_len_sum]
+                ).detach().cpu().tolist()
                 if self.world > 1:
                     # Every rank must issue the same collectives: reduce (sum, count) unconditionally.
-                    tot = allreduce_mean(float(sum(finished_returns))) * self.world
-                    cnt = allreduce_mean(float(len(finished_returns))) * self.world
-                    finished_returns = [tot / cnt] if cnt > 0 else []
-                    n_finished = int(round(cnt))
-                else:
-                    n_finished = len(finished_returns)
+                    return_sum = allreduce_mean(return_sum) * self.world
+                    return_count = allreduce_mean(return_count) * self.world
+                    len_sum = allreduce_mean(len_sum) * self.world
+                n_finished = int(round(return_count))
+                agg_log: dict[str, float] = {}
                 if not self.is_main:
                     agg, agg_n = {}, 0
-                    finished_returns, finished_lens = [], []
                     timers = {k: 0.0 for k in timers}
                 elif agg_n > 0:
-                    for k, v in agg.items():
+                    agg_keys = list(agg)
+                    agg_values = torch.stack(
+                        [
+                            value.detach().reshape(()) if isinstance(value, torch.Tensor) else torch.as_tensor(value, device=self.device)
+                            for value in agg.values()
+                        ]
+                    ).cpu().tolist()
+                    agg_log = {k: float(v) for k, v in zip(agg_keys, agg_values)}
+                    for k, v in agg_log.items():
                         self.writer.add_scalar(k, v / (agg_n if k != "lr" else 1), it)
                 if not self.is_main:
                     tr = float("nan")
-                elif finished_returns:
-                    tr = sum(finished_returns) / len(finished_returns)
+                elif n_finished:
+                    tr = return_sum / return_count
                     self.writer.add_scalar("train/episode_norm_return", tr, it)
-                    self.writer.add_scalar("train/episode_len", sum(finished_lens) / max(len(finished_lens), 1), it)
+                    self.writer.add_scalar("train/episode_len", len_sum / return_count, it)
                 else:
                     tr = float("nan")
                 with torch.no_grad():
@@ -238,8 +258,9 @@ class Trainer:
                     else:
                         err = None
                 if self.is_main:
-                    for k, v in timers.items():
-                        self.writer.add_scalar(f"time/{k}_s_per_iter", v / sch.log_interval, it)
+                    if profile_timing:
+                        for k, v in timers.items():
+                            self.writer.add_scalar(f"time/{k}_s_per_iter", v / sch.log_interval, it)
                     self.writer.add_scalar("time/hours", elapsed / 3600, it)
                     self.writer.add_scalar("time/updates", self.num_updates, it)
                     self.writer.add_scalar("sampler/entropy", float(self.command.metrics["sampling_entropy"][0]), it)
@@ -249,11 +270,11 @@ class Trainer:
                     msg = (
                         f"it {it} | {elapsed/3600:.2f} h | {sch.log_interval / dt_log:.1f} it/s | updates {self.num_updates} | "
                         f"train_ret {tr:.3f} (n={n_finished}) | "
-                        f"wm nse1 {agg.get('wm/nse_1step', float('nan'))/max(agg_n,1):.4f} nse8 {(float(err[-1]) if err is not None else float('nan')):.4f} | "
-                        f"imag_ret {agg.get('policy/imag_return_undisc', float('nan'))/max(agg_n,1):.3f} surv {agg.get('policy/imag_survival_H', float('nan'))/max(agg_n,1):.3f} | "
-                        f"t sim/wm/pi {timers['sim']:.1f}/{timers['wm']:.1f}/{timers['policy']:.1f}s"
+                        f"wm nse1 {agg_log.get('wm/nse_1step', float('nan'))/max(agg_n,1):.4f} nse8 {(float(err[-1]) if err is not None else float('nan')):.4f} | "
+                        f"imag_ret {agg_log.get('policy/imag_return_undisc', float('nan'))/max(agg_n,1):.3f} surv {agg_log.get('policy/imag_survival_H', float('nan'))/max(agg_n,1):.3f} | "
+                        + (f"t sim/wm/pi {timers['sim']:.1f}/{timers['wm']:.1f}/{timers['policy']:.1f}s" if profile_timing else "")
                     )
-                    if cfg.policy_trainer.profile_timing:
+                    if profile_timing:
                         msg += (
                             f" | pi imagine/actor/critic "
                             f"{agg.get('policy/time_imagine_s', 0.0) / max(agg_n, 1):.1f}/"
@@ -262,7 +283,9 @@ class Trainer:
                         )
                     print(msg, flush=True)
                 agg, agg_n = {}, 0
-                finished_returns, finished_lens = [], []
+                finished_return_sum.zero_()
+                finished_return_count.zero_()
+                finished_len_sum.zero_()
                 timers = {k: 0.0 for k in timers}
             if self.iteration % sch.checkpoint_interval == 0:
                 self.save("ckpt_latest.pt")

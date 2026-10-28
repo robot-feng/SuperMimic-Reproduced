@@ -29,7 +29,7 @@ class ImagRollout:
     goals: torch.Tensor  # (H+1, n, 680)
     e_root: torch.Tensor  # (H+1, n, 4)
     frames: torch.Tensor  # (H+1, n)
-    reward_terms: dict  # mean of each reward term over the rollout (diagnostics)
+    reward_terms: dict[str, torch.Tensor]  # mean of each reward term over the rollout (diagnostics)
 
 
 def imagine(
@@ -126,5 +126,5 @@ def imagine(
         goals=torch.stack(goals),
         e_root=torch.stack(e_roots),
         frames=torch.stack(frames),
-        reward_terms={k: float(v / horizon) for k, v in zip(REWARD_TERM_NAMES, term_sum.tolist())},
+        reward_terms={k: v / horizon for k, v in zip(REWARD_TERM_NAMES, term_sum.unbind())},
     )
