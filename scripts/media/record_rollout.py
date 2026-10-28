@@ -23,7 +23,9 @@ from supermimic.eval.benchmark import load_policy_from_checkpoint
 
 
 @torch.no_grad()
-def main(ckpt: Path, clips: list[str], npz_dir: Path = Path("data/npz/bones_seed"), out: Path = Path("media/rollouts.npz"), device: str = "cuda:0") -> None:
+def main(ckpt: Path, clips: list[str], npz_dir: Path = Path("data/npz/bones_seed"), out: Path = Path("media/rollouts.npz"), device: str = "cuda:0", max_steps: int | None = None) -> None:
+    if max_steps is not None and max_steps <= 0:
+        raise ValueError("max_steps must be positive")
     files = [str(f) for f in discover_npz(npz_dir, names=clips)]
     missing = set(clips) - {Path(f).stem for f in files}
     assert not missing, f"clips not found in {npz_dir}: {sorted(missing)}"
@@ -63,6 +65,8 @@ def main(ckpt: Path, clips: list[str], npz_dir: Path = Path("data/npz/bones_seed
             alive &= ~done
             if alive.any():
                 snapshot()
+            if max_steps is not None and int(steps.max()) >= max_steps:
+                break
             if steps.max() > 20000:
                 break
         names = [lib.clips[i].name for i in range(n)]

@@ -9,8 +9,10 @@ from __future__ import annotations
 
 import os
 import re
+import shutil
 import subprocess
 from pathlib import Path
+from typing import Literal
 
 os.environ.setdefault("MUJOCO_GL", "glfw")
 import mujoco
@@ -20,10 +22,10 @@ from PIL import Image, ImageDraw, ImageFont
 
 from mjlab.asset_zoo.robots.unitree_g1.g1_constants import G1_XML
 
-GHOST_RGBA = "0.25 0.50 1.0 0.22"
+GHOST_RGBA = "0.18 0.52 0.92 0.82"
 
 
-def two_robot_xml(mjcf: Path, root_body: str) -> str:
+def two_robot_xml(mjcf: Path, root_body: str, ghost_rgba: str = GHOST_RGBA) -> str:
     xml = mjcf.read_text()
     xml = re.sub(r'meshdir="([^"]*)"', lambda m: f'meshdir="{(mjcf.parent / m.group(1)).resolve()}"', xml, count=1)
     # strip anything that is not needed for drawing (actuators / sensors / keyframes keep working but are unused)
@@ -32,23 +34,23 @@ def two_robot_xml(mjcf: Path, root_body: str) -> str:
     # keep only the visual mesh geoms of the ghost, visual-only and translucent
     ghost = re.sub(r"<geom\b[^>]*/>", lambda m: "" if "mesh=" not in m.group(0) else m.group(0), ghost)
     ghost = re.sub(r' (contype|conaffinity|group|material|rgba|class)="[^"]*"', "", ghost)
-    ghost = ghost.replace("<geom ", f'<geom type="mesh" contype="0" conaffinity="0" group="1" rgba="{GHOST_RGBA}" ')
+    ghost = ghost.replace("<geom ", f'<geom type="mesh" contype="0" conaffinity="0" group="1" rgba="{ghost_rgba}" ')
     ghost = re.sub(r"<site[^>]*/>", "", ghost)
     ghost = re.sub(r"<freejoint[^>]*/>", '<freejoint name="ref_root"/>', ghost, count=1)
     scene = """
-    <light name="top" pos="0 0 5" dir="0 0 -1" directional="true" diffuse="0.45 0.45 0.45" specular="0.05 0.05 0.05" castshadow="true"/>
+    <light name="key" pos="-2 -3 5" dir="0.3 0.4 -1" directional="true" diffuse="0.48 0.48 0.48" specular="0.10 0.10 0.10" castshadow="true"/>
+    <light name="fill" pos="3 1 4" dir="-0.4 -0.2 -1" directional="true" diffuse="0.18 0.20 0.24" specular="0.02 0.02 0.02" castshadow="false"/>
     
     <geom name="floor" type="plane" size="0 0 0.05" material="grid" contype="0" conaffinity="0"/>
     """
     xml = xml.replace("</worldbody>", ghost + scene + "</worldbody>")
     assets = """
-    <texture name="grid" type="2d" builtin="checker" rgb1="0.90 0.91 0.93" rgb2="0.76 0.78 0.82" width="512" height="512" mark="edge" markrgb="0.68 0.70 0.74"/>
-    <material name="grid" texture="grid" texrepeat="2 2" texuniform="true" reflectance="0.0" specular="0.05" shininess="0.05"/>
-    <texture name="sky" type="skybox" builtin="gradient" rgb1="0.97 0.97 0.98" rgb2="0.80 0.84 0.90" width="256" height="256"/>
+    <material name="grid" rgba="0.26 0.29 0.33 1" reflectance="0.0" specular="0.0" shininess="0.0"/>
+    <texture name="sky" type="skybox" builtin="gradient" rgb1="0.28 0.34 0.41" rgb2="0.16 0.20 0.26" width="256" height="256"/>
     """
     xml = xml.replace("<asset>", "<asset>" + assets, 1)
     xml = xml.replace("<mujoco", '<mujoco', 1)
-    visual = '<visual><global offwidth="1920" offheight="1080"/><quality shadowsize="4096" offsamples="8"/><map znear="0.01"/><headlight ambient="0.25 0.25 0.25" diffuse="0.35 0.35 0.35" specular="0.15 0.15 0.15"/></visual>\n'
+    visual = '<visual><global offwidth="1920" offheight="1080"/><quality shadowsize="4096" offsamples="8"/><map znear="0.01"/><headlight ambient="0.34 0.34 0.36" diffuse="0.18 0.18 0.20" specular="0.05 0.05 0.05"/></visual>\n'
     xml = re.sub(r"<visual>.*?</visual>", "", xml, flags=re.S)
     xml = xml.replace("<asset>", visual + "  <asset>", 1)
     # actuators/sensors/keyframes reference names that still exist; keep the file valid by removing them anyway
@@ -58,14 +60,28 @@ def two_robot_xml(mjcf: Path, root_body: str) -> str:
     return xml
 
 
-def draw_label(img: np.ndarray, text: str, sub: str, font, font_small) -> np.ndarray:
+def draw_label(img: np.ndarray, text: str, sub: str, font, font_small, layout: str = "overlay") -> np.ndarray:
     im = Image.fromarray(img)
     dr = ImageDraw.Draw(im, "RGBA")
-    pad = 14
-    w = max(dr.textlength(text, font=font), dr.textlength(sub, font=font_small)) + 2 * pad
-    dr.rounded_rectangle([16, 16, 16 + w, 16 + 2 * pad + 52], radius=10, fill=(20, 24, 32, 150))
-    dr.text((16 + pad, 16 + pad - 2), text, font=font, fill=(255, 255, 255, 255))
-    dr.text((16 + pad, 16 + pad + 28), sub, font=font_small, fill=(210, 220, 235, 255))
+    width, height = im.size
+    pad = 12
+    w = min(width - 32, max(dr.textlength(text, font=font), dr.textlength(sub, font=font_small)) + 2 * pad)
+    dr.rounded_rectangle([16, 16, 16 + w, 72], radius=10, fill=(22, 31, 43, 220))
+    dr.text((16 + pad, 23), text, font=font, fill=(255, 255, 255, 255))
+    dr.text((16 + pad, 50), sub, font=font_small, fill=(205, 220, 235, 255))
+    if layout == "side-by-side":
+        for x, caption, color in ((width * .34, "POLICY", (235, 240, 247, 255)),
+                                  (width * .66, "REFERENCE", (103, 189, 255, 255))):
+            tw = dr.textlength(caption, font=font_small)
+            dr.rounded_rectangle((x - tw / 2 - 12, height - 43, x + tw / 2 + 12, height - 13),
+                                 radius=8, fill=(22, 31, 43, 210))
+            dr.text((x - tw / 2, height - 37), caption, font=font_small, fill=color)
+    else:
+        dr.rounded_rectangle((16, height - 43, 207, height - 13), radius=8, fill=(22, 31, 43, 210))
+        dr.ellipse((28, height - 33, 36, height - 25), fill=(230, 235, 241, 255))
+        dr.text((43, height - 37), "POLICY", font=font_small, fill=(235, 240, 247, 255))
+        dr.ellipse((106, height - 33, 114, height - 25), fill=(79, 177, 255, 255))
+        dr.text((121, height - 37), "REFERENCE", font=font_small, fill=(143, 205, 255, 255))
     return np.asarray(im)
 
 
@@ -77,11 +93,20 @@ def pretty(name: str) -> str:
 
 
 def main(traj: Path, out_dir: Path, fps: int = 25, seconds: float | None = None, width: int = 1280, height: int = 720,
-         azimuth: float = 140.0, elevation: float = -14.0, distance: float = 2.7, ghost: bool = True, label: bool = True, clips: list[str] | None = None,
+         azimuth: float = 140.0, elevation: float = -25.0, distance: float = 2.8, ghost: bool = True, label: bool = True, clips: list[str] | None = None,
+         layout: Literal["side-by-side", "overlay"] = "overlay",
          concat: Path | None = None, segments: list[str] | None = None, titles: list[str] | None = None) -> None:
     """``segments``: per-clip time windows as ``name:start:end`` (seconds); ``titles``: ``name=Display title`` overrides."""
 
-    model = mujoco.MjModel.from_xml_string(two_robot_xml(Path(G1_XML), "pelvis"))
+    ffmpeg = shutil.which("ffmpeg")
+    if ffmpeg is None:
+        try:
+            import imageio_ffmpeg
+            ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
+        except ImportError as exc:
+            raise RuntimeError("Install ffmpeg or imageio-ffmpeg to render videos") from exc
+    ghost_rgba = GHOST_RGBA if layout == "side-by-side" else "0.18 0.58 1.0 0.36"
+    model = mujoco.MjModel.from_xml_string(two_robot_xml(Path(G1_XML), "pelvis", ghost_rgba))
     data = mujoco.MjData(model)
     renderer = mujoco.Renderer(model, height, width)
     opt = mujoco.MjvOption()
@@ -93,8 +118,9 @@ def main(traj: Path, out_dir: Path, fps: int = 25, seconds: float | None = None,
     cam = mujoco.MjvCamera()
     cam.type = mujoco.mjtCamera.mjCAMERA_FREE
     try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 30)
-        font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 20)
+        font_dir = Path("C:/Windows/Fonts") if os.name == "nt" else Path("/usr/share/fonts/truetype/dejavu")
+        font = ImageFont.truetype(str(font_dir / ("segoeuib.ttf" if os.name == "nt" else "DejaVuSans-Bold.ttf")), 20)
+        font_small = ImageFont.truetype(str(font_dir / ("segoeui.ttf" if os.name == "nt" else "DejaVuSans.ttf")), 13)
     except OSError:
         font = font_small = ImageFont.load_default()
 
@@ -116,31 +142,38 @@ def main(traj: Path, out_dir: Path, fps: int = 25, seconds: float | None = None,
         qr, qf = d["robot_qpos"][i, a:b], d["ref_qpos"][i, a:b]
         T = b - a
         out = out_dir / f"{name}.mp4"
-        ff = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{width}x{height}", "-r", str(fps), "-i", "-",
+        ff = subprocess.Popen([ffmpeg, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{width}x{height}", "-r", str(fps), "-i", "-",
                                "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", "-movflags", "+faststart", str(out)], stdin=subprocess.PIPE)
         # smooth camera: follow a low-passed root position
-        target = qr[0, :3].copy()
+        target = (qr[0, :3] + qf[0, :3]) / 2
+        angle = np.deg2rad(azimuth)
+        side = np.array([-np.sin(angle), np.cos(angle)]) * 0.70
         for t in range(0, T, stride):
             data.qpos[:nq_robot] = qr[t]
             data.qpos[nq_robot:] = qf[t]
+            if layout == "side-by-side" and ghost:
+                data.qpos[:2] += side
+                data.qpos[nq_robot:nq_robot + 2] -= side
             if not ghost:
                 data.qpos[nq_robot:nq_robot + 3] = [0, 0, -5]
             mujoco.mj_forward(model, data)
-            target = 0.92 * target + 0.08 * qr[t, :3]
+            target = 0.92 * target + 0.08 * ((qr[t, :3] + qf[t, :3]) / 2)
             cam.lookat[:] = [target[0], target[1], 0.65]
             cam.distance, cam.azimuth, cam.elevation = distance, azimuth, elevation
             renderer.update_scene(data, cam, opt)
             img = renderer.render()
             if label:
-                img = draw_label(img, ttl.get(name, pretty(name)), f"normalized return {float(d['norm_return'][i]):.2f}   t = {(a + t)/50:4.1f} s", font, font_small)
+                img = draw_label(img, ttl.get(name, pretty(name)), f"mean return {float(d['norm_return'][i]):.2f}   |   {(a + t)/50:4.1f} s", font, font_small, layout)
             ff.stdin.write(np.ascontiguousarray(img).tobytes())
-        ff.stdin.close(); ff.wait()
+        ff.stdin.close()
+        if ff.wait() != 0:
+            raise RuntimeError(f"ffmpeg failed while writing {out}")
         outputs.append(out)
         print("wrote", out, f"{T/50:.1f} s")
     if concat and outputs:
         lst = out_dir / "concat.txt"
         lst.write_text("".join(f"file '{p.resolve()}'\n" for p in outputs))
-        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", str(concat)], check=True)
+        subprocess.run([ffmpeg, "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", str(concat)], check=True)
         print("wrote", concat)
 
 

@@ -74,6 +74,18 @@ uv run sm-train --run-name lafan1-rtx5060-eager --log-root logs --data.npz-dir d
 
 这个配置保留完整 LAFAN1、默认网络宽度和 32 步想象视野，batch 为 1024/1024；不会把这组结果称作论文硬件配置下的复现。策略 batch 2048 曾在 actor 反向传播阶段耗尽 8 GiB 显存，所以当前配方采用此前能完成首个日志窗口的 1024。Windows 环境带有与 PyTorch 2.14 匹配的 `triton-windows`，但本机 RTX 5060 上完整训练图编译超过 20 分钟仍未出首个日志点，因此此配方显式关闭 `torch.compile`。普通训练会避免逐环境步同步 GPU，把 episode 汇总和训练指标留在 GPU 上，按日志窗口一起回传。仅在要精确拆分阶段耗时时追加 `--policy-trainer.profile-timing`；它会强制同步，适合短时诊断，不建议用于正式长跑。
 
+## 曲线和定期视频
+
+训练每 50 次迭代写入 TensorBoard，当前本机面板为 http://127.0.0.1:16006/ 。视频监视进程独立于训练：每当编号 checkpoint 保存完成，它在 CPU 上用 `walk1_subject1` 录制最多 400 步（8 秒）并生成视频，避免额外占用训练显存。每次结果在 `logs/lafan1-rtx5060-eager/visual_eval/ckpt_0000500/` 等目录，包括 MP4、轨迹、`summary.json` 和 `evaluation.log`；`.done` 表示生成成功，`.failed` 表示需要查看日志。视频内实体为策略，半透明蓝色为参考，分数按实际执行步数归一化，固定短片用于观察变化，不是完整数据集 benchmark。
+
+重新启动训练后，需为新的训练进程启动一次监视器（将 PID 替换为实际的训练 Python 进程 ID）：
+
+```powershell
+uv run python scripts/media/watch_evaluations.py --run-dir logs/lafan1-rtx5060-eager --npz-dir data/npz/lafan1 --train-pid <PID>
+```
+
+监视器默认跟随 checkpoint 保存间隔；当前训练设置为 500 次迭代。训练正常结束时还会处理最终的 `ckpt_latest.pt`。另外，可用 `scripts/eval_benchmark.py` 对全体 clip 做独立的数值评测。
+
 ## Linux / WSL 备选
 
 mjlab 官方安装说明更推荐 Linux + NVIDIA GPU 训练；Windows 支持仍属初步测试。如果原生 Windows 的 MuJoCo Warp 工作流遇到平台问题，可改在 WSL 2 Ubuntu 中运行。WSL 2 CUDA 使用 Windows NVIDIA 驱动；参见 [微软 WSL CUDA 指南](https://learn.microsoft.com/windows/ai/directml/gpu-cuda-in-wsl)、[mjlab 安装说明](https://mujocolab.github.io/mjlab/v1.6.0/source/installation.html) 和 [mjlab 平台 FAQ](https://mujocolab.github.io/mjlab/v1.6.0/source/faq.html)。WSL 不是当前首选设置步骤。
