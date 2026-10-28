@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass
 
 import torch
@@ -34,6 +35,7 @@ class PolicyTrainerCfg:
     use_critic: bool = True
     obs_noise: bool = True
     compile: str | None = "default"
+    profile_timing: bool = False
     anchor_obs: bool = False  # None | "default" | "reduce-overhead" | "max-autotune-no-cudagraphs"
 
 
@@ -59,6 +61,10 @@ class PolicyTrainer:
 
     def update(self, buffer: ReplayBuffer, xi_norm_fn=None) -> dict[str, float]:
         cfg = self.cfg
+        profile = cfg.profile_timing
+        if profile:
+            torch.cuda.synchronize()
+            t_phase = time.perf_counter()
         start = buffer.sample_starts(cfg.batch_size, cfg.history)
         xi_norm = self.wm.spec.normalize_xi(start.xi)
 
@@ -71,6 +77,10 @@ class PolicyTrainer:
             v_H = self.critic(feat[-1], goals[-1], xi_norm, e_root[-1])
         else:
             v_H = None
+        if profile:
+            torch.cuda.synchronize()
+            imagine_s = time.perf_counter() - t_phase
+            t_phase = time.perf_counter()
         J = policy_objective(ro, v_H, cfg.gamma)
         loss = -J / cfg.horizon
         self.opt.zero_grad(set_to_none=True)
@@ -81,6 +91,10 @@ class PolicyTrainer:
         self.opt.step()
         self.wm.requires_grad_(True)
         self.critic.requires_grad_(True)
+        if profile:
+            torch.cuda.synchronize()
+            actor_s = time.perf_counter() - t_phase
+            t_phase = time.perf_counter()
 
         metrics = {
             "imag_objective": float(J.detach()),
@@ -91,6 +105,10 @@ class PolicyTrainer:
             "policy_grad_norm": float(gn),
             "action_abs_mean": float(ro.actions.abs().mean().detach()),
         }
+        if profile:
+            metrics["time_imagine_s"] = imagine_s
+            metrics["time_actor_s"] = actor_s
+            metrics["time_critic_s"] = 0.0
         for k, v in ro.reward_terms.items():
             metrics[f"imag_r/{k}"] = v
 
@@ -125,4 +143,7 @@ class PolicyTrainer:
             metrics["critic_loss"] = float(last)
             metrics["critic_value_mean"] = float(values.mean())
             metrics["critic_target_mean"] = float(targets.mean())
+        if profile:
+            torch.cuda.synchronize()
+            metrics["time_critic_s"] = time.perf_counter() - t_phase
         return metrics

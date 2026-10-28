@@ -253,6 +253,13 @@ class Trainer:
                         f"imag_ret {agg.get('policy/imag_return_undisc', float('nan'))/max(agg_n,1):.3f} surv {agg.get('policy/imag_survival_H', float('nan'))/max(agg_n,1):.3f} | "
                         f"t sim/wm/pi {timers['sim']:.1f}/{timers['wm']:.1f}/{timers['policy']:.1f}s"
                     )
+                    if cfg.policy_trainer.profile_timing:
+                        msg += (
+                            f" | pi imagine/actor/critic "
+                            f"{agg.get('policy/time_imagine_s', 0.0) / max(agg_n, 1):.1f}/"
+                            f"{agg.get('policy/time_actor_s', 0.0) / max(agg_n, 1):.1f}/"
+                            f"{agg.get('policy/time_critic_s', 0.0) / max(agg_n, 1):.1f}s"
+                        )
                     print(msg, flush=True)
                 agg, agg_n = {}, 0
                 finished_returns, finished_lens = [], []

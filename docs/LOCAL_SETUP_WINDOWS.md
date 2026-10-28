@@ -64,14 +64,15 @@ uv run sm-train --run-name local-smoke --data.npz-dir data/npz/lafan1 --data.lim
 这是缩小后的管线检查，不是论文结果。全量 BONES-SEED 紧凑动作库约 6.7 GB 且常驻显存，RTX 5060 的 8 GB 显存不能同时容纳它和训练状态。当前机器已下载并转换完整的 40 条 LAFAN1（2.451 小时），可用下面的显存缩放配置做完整数据集训练；它与论文的 4096 环境正式设置不等价，结果应按本机单卡配置报告：
 
 ```powershell
-uv run sm-train --run-name lafan1-rtx5060-512e1024wm2048p-compiled --log-root logs --data.npz-dir data/npz/lafan1 `
+uv run sm-train --run-name lafan1-rtx5060-eager-profile --log-root logs --data.npz-dir data/npz/lafan1 `
   --env.num-envs 512 `
-  --wm-trainer.batch-size 1024 `
+  --wm-trainer.batch-size 1024 --wm-trainer.compile None `
   --policy-trainer.batch-size 2048 --policy-trainer.horizon 32 `
+  --policy-trainer.compile None --policy-trainer.profile-timing `
   --schedule.max-hours 3 --schedule.log-interval 50 --schedule.checkpoint-interval 500
 ```
 
-这个配置保留完整 LAFAN1、默认网络宽度和 32 步想象视野，增大 batch 来利用本机显存；不会把这组结果称作论文硬件配置下的复现。Windows 安装 PyTorch 2.14 对应的 `triton-windows` 后会默认启用 `torch.compile`；首次编译会花一些时间。
+这个配置保留完整 LAFAN1、默认网络宽度和 32 步想象视野，batch 为 1024/2048，并记录策略想象、actor 反向传播、critic 更新三段耗时；不会把这组结果称作论文硬件配置下的复现。Windows 环境带有与 PyTorch 2.14 匹配的 `triton-windows`，但本机 RTX 5060 上完整训练图编译超过 20 分钟仍未出首个日志点，因此此配方显式关闭 `torch.compile`，先用分段计时找出实际瓶颈。
 
 ## Linux / WSL 备选
 
