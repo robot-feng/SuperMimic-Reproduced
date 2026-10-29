@@ -1,0 +1,50 @@
+{
+  "checkpoint": "logs\\lafan1-rtx5060-eager\\ckpt_0002000.pt",
+  "iteration": 2000,
+  "seed": 21,
+  "worlds": 36,
+  "steps_per_world": 200,
+  "head_updates": 1000,
+  "train_count": 4776,
+  "test_count": 2388,
+  "train_correct_positives": 24,
+  "train_shifted_positives": 48,
+  "train_disagree": 24,
+  "test_correct_positives": 9,
+  "baseline": {
+    "count": 2388,
+    "positives": 9,
+    "bce": 0.00472421245649457,
+    "brier": 0.0017673939000815153,
+    "accuracy": 0.9970687031745911,
+    "recall": 0.5555555820465088,
+    "false_positive_rate": 0.0012610340490937233,
+    "mean_positive_prob": 0.6688457727432251,
+    "mean_negative_prob": 0.001471653813496232
+  },
+  "finetuned": {
+    "correct": {
+      "count": 2388,
+      "positives": 9,
+      "bce": 0.0028888541273772717,
+      "brier": 0.000782981573138386,
+      "accuracy": 0.999162495136261,
+      "recall": 0.8888888955116272,
+      "false_positive_rate": 0.0004203446733299643,
+      "mean_positive_prob": 0.79750657081604,
+      "mean_negative_prob": 0.0014775496674701571
+    },
+    "shifted": {
+      "count": 2388,
+      "positives": 9,
+      "bce": 0.008878073655068874,
+      "brier": 0.0028147364500910044,
+      "accuracy": 0.9958124160766602,
+      "recall": 1.0,
+      "false_positive_rate": 0.004203446675091982,
+      "mean_positive_prob": 0.9794260859489441,
+      "mean_negative_prob": 0.0046134828589856625
+    }
+  },
+  "notes": "labels sampled as 1-step windows; features use actual next states; head only; held-out envs, not unseen clips; no actor/critic update"
+}

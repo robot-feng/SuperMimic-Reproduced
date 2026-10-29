@@ -1,0 +1,198 @@
+{
+  "config": {
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "steps": 60,
+    "lr": 0.04,
+    "gamma": 0.99,
+    "mu": 2.0,
+    "sigma": 2.5,
+    "horizon": 8
+  },
+  "max_objective_identity_error": 1.7763568394002505e-15,
+  "max_finite_difference_gradient_error": 8.881784197001251e-11,
+  "max_gae_identity_error": 6.661338147750939e-16,
+  "records": [
+    {
+      "seed": 0,
+      "initial_theta": 0.2755374812200385,
+      "final_theta": {
+        "raw": 0.36707785154036954,
+        "consistent": 0.3670778515421459,
+        "terminal_only": 0.490443386653976
+      },
+      "raw_objective_at_final": {
+        "raw": 5.015705054101176,
+        "consistent": 5.015705054101175,
+        "terminal_only": 4.864705366831439
+      }
+    },
+    {
+      "seed": 1,
+      "initial_theta": -0.29250860471007906,
+      "final_theta": {
+        "raw": 0.3670778515412252,
+        "consistent": 0.36707785154211336,
+        "terminal_only": 0.4904433866539435
+      },
+      "raw_objective_at_final": {
+        "raw": 5.015705054101176,
+        "consistent": 5.015705054101175,
+        "terminal_only": 4.8647053668315134
+      }
+    },
+    {
+      "seed": 2,
+      "initial_theta": 0.3648274175113996,
+      "final_theta": {
+        "raw": 0.36707785154252537,
+        "consistent": 0.367077851540749,
+        "terminal_only": 0.49044338665613185
+      },
+      "raw_objective_at_final": {
+        "raw": 5.015705054101176,
+        "consistent": 5.015705054101176,
+        "terminal_only": 4.864705366826368
+      }
+    },
+    {
+      "seed": 3,
+      "initial_theta": -0.2096282983264869,
+      "final_theta": {
+        "raw": 0.36707785154244604,
+        "consistent": 0.3670778515446665,
+        "terminal_only": 0.4904433866542761
+      },
+      "raw_objective_at_final": {
+        "raw": 5.015705054101175,
+        "consistent": 5.015705054101176,
+        "terminal_only": 4.864705366830733
+      }
+    },
+    {
+      "seed": 4,
+      "initial_theta": -0.2111615282100524,
+      "final_theta": {
+        "raw": 0.36707785154060335,
+        "consistent": 0.36707785154104744,
+        "terminal_only": 0.4904433866524334
+      },
+      "raw_objective_at_final": {
+        "raw": 5.015705054101175,
+        "consistent": 5.015705054101175,
+        "terminal_only": 4.864705366835064
+      }
+    },
+    {
+      "seed": 5,
+      "initial_theta": 0.09832135591176155,
+      "final_theta": {
+        "raw": 0.3670778515425013,
+        "consistent": 0.36707785154427763,
+        "terminal_only": 0.4904433866578841
+      },
+      "raw_objective_at_final": {
+        "raw": 5.015705054101176,
+        "consistent": 5.015705054101176,
+        "terminal_only": 4.864705366822249
+      }
+    },
+    {
+      "seed": 6,
+      "initial_theta": 0.2346720670093304,
+      "final_theta": {
+        "raw": 0.36707785154488015,
+        "consistent": 0.36707785154132744,
+        "terminal_only": 0.4904433866549339
+      },
+      "raw_objective_at_final": {
+        "raw": 5.015705054101176,
+        "consistent": 5.015705054101175,
+        "terminal_only": 4.864705366829186
+      }
+    },
+    {
+      "seed": 7,
+      "initial_theta": -0.14093378813347013,
+      "final_theta": {
+        "raw": 0.36707785153970807,
+        "consistent": 0.3670778515423726,
+        "terminal_only": 0.4904433866550909
+      },
+      "raw_objective_at_final": {
+        "raw": 5.015705054101176,
+        "consistent": 5.015705054101174,
+        "terminal_only": 4.864705366828816
+      }
+    },
+    {
+      "seed": 8,
+      "initial_theta": -0.21863531249516097,
+      "final_theta": {
+        "raw": 0.36707785154205497,
+        "consistent": 0.36707785154205497,
+        "terminal_only": 0.4904433866547733
+      },
+      "raw_objective_at_final": {
+        "raw": 5.015705054101175,
+        "consistent": 5.015705054101175,
+        "terminal_only": 4.864705366829563
+      }
+    },
+    {
+      "seed": 9,
+      "initial_theta": -0.02959411374798282,
+      "final_theta": {
+        "raw": 0.36707785154371214,
+        "consistent": 0.36707785154371214,
+        "terminal_only": 0.4904433866564305
+      },
+      "raw_objective_at_final": {
+        "raw": 5.0157050541011765,
+        "consistent": 5.0157050541011765,
+        "terminal_only": 4.864705366825667
+      }
+    },
+    {
+      "seed": 10,
+      "initial_theta": 0.05712207575193079,
+      "final_theta": {
+        "raw": 0.3670778515461103,
+        "consistent": 0.3670778515443339,
+        "terminal_only": 0.49044338665616405
+      },
+      "raw_objective_at_final": {
+        "raw": 5.015705054101176,
+        "consistent": 5.015705054101175,
+        "terminal_only": 4.864705366826292
+      }
+    },
+    {
+      "seed": 11,
+      "initial_theta": -0.0380963571921451,
+      "final_theta": {
+        "raw": 0.36707785154483513,
+        "consistent": 0.3670778515421706,
+        "terminal_only": 0.49044338665844167
+      },
+      "raw_objective_at_final": {
+        "raw": 5.015705054101175,
+        "consistent": 5.015705054101175,
+        "terminal_only": 4.864705366820937
+      }
+    }
+  ],
+  "notes": "Scalar differentiable soft-survival toy; true and modeled dynamics/hazard coincide. No G1, optimization improvement, or novelty claim. Consistent transformation should reproduce raw trajectory; terminal-only changes objective."
+}

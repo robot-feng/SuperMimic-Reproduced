@@ -19,7 +19,7 @@ from supermimic.imagination.policy_trainer import PolicyTrainer
 from supermimic.kinematics.g1_fk import G1Kinematics
 from supermimic.policy.nets import Critic, Policy
 from supermimic.training.distributed import allreduce_mean, broadcast_params, finalize, init_distributed, world_size
-from supermimic.training.schedule import cosine_lr
+from supermimic.training.schedule import training_learning_rates
 from supermimic.world_model.heads import AnalyticHeads
 from supermimic.world_model.wm_trainer import WorldModelTrainer
 from supermimic.world_model.world_model import WorldModel
@@ -189,9 +189,12 @@ class Trainer:
                 self._utd_acc += sch.updates_per_env_step
                 while self._utd_acc >= 1.0:
                     self._utd_acc -= 1.0
-                    lr = cosine_lr(self.iteration, sch.total_iterations, cfg.wm_trainer.lr, sch.lr_final_ratio, sch.lr_decay_fraction)
+                    lr, actor_lr, critic_lr = training_learning_rates(
+                        self.iteration, sch.total_iterations, cfg.wm_trainer.lr, cfg.policy_trainer.lr,
+                        cfg.policy_trainer.critic_lr, sch.lr_final_ratio, sch.lr_decay_fraction,
+                    )
                     self.wm_trainer.set_lr(lr)
-                    self.policy_trainer.set_lr(lr * cfg.policy_trainer.lr / cfg.wm_trainer.lr)
+                    self.policy_trainer.set_lr(actor_lr, critic_lr)
                     if profile_timing:
                         t0 = time.perf_counter()
                     m_wm = self.wm_trainer.update(self.buffer)
@@ -210,6 +213,8 @@ class Trainer:
                     for k, v in m_pi.items():
                         agg[f"policy/{k}"] = agg.get(f"policy/{k}", 0.0) + v
                     agg["lr"] = lr
+                    agg["learning_rate/actor"] = actor_lr
+                    agg["learning_rate/critic"] = critic_lr
                     agg_n += 1
 
             # ---------------- logging / checkpoints
@@ -241,7 +246,8 @@ class Trainer:
                     ).cpu().tolist()
                     agg_log = {k: float(v) for k, v in zip(agg_keys, agg_values)}
                     for k, v in agg_log.items():
-                        self.writer.add_scalar(k, v / (agg_n if k != "lr" else 1), it)
+                        is_rate = k == "lr" or k.startswith("learning_rate/")
+                        self.writer.add_scalar(k, v / (1 if is_rate else agg_n), it)
                 if not self.is_main:
                     tr = float("nan")
                 elif n_finished:

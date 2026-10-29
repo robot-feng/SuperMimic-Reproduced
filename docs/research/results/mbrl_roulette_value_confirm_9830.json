@@ -1,0 +1,178 @@
+[
+  {
+    "seed": 9830,
+    "samples": 300000,
+    "gamma": 0.99,
+    "q": 0.99,
+    "failure_probability": 0.001,
+    "reward": 0.01,
+    "critic": 0.1,
+    "horizon": 80,
+    "true_value": 0.9099181073703321,
+    "results": {
+      "roulette": {
+        "mean": 0.9068135499999999,
+        "bias": -0.003104557370332217,
+        "variance": 0.6594381900336975,
+        "mse": 0.6594456301828631,
+        "mean_se": 0.001482608276016401
+      },
+      "fixed_bootstrap": {
+        "mean": 0.5750449209024682,
+        "bias": -0.3348731864678639,
+        "variance": 0.007812290633210902,
+        "mse": 0.11995231560738297,
+        "mean_se": 0.00016137214374658862
+      },
+      "cross_error_0.1": {
+        "mean": 0.6526490071499998,
+        "truth": 0.6559673406463408,
+        "se": 0.0020786665486377965,
+        "negative_fraction": 0.01909
+      },
+      "cross_error_0.0": {
+        "mean": 0.8242990121499999,
+        "truth": 0.8279509621204072,
+        "se": 0.0022528783660116358,
+        "negative_fraction": 0.0
+      }
+    },
+    "mean_effective_steps": {
+      "roulette": 90.64772,
+      "fixed": 76.87988333333334
+    },
+    "notes": "Scalar i.i.d. failure toy, exact geometric episode and independent roulette; no dynamics, robot or model training. Fixed and roulette share failure sample; cross error uses a second independent trajectory and roulette."
+  },
+  {
+    "seed": 9830,
+    "samples": 300000,
+    "gamma": 0.99,
+    "q": 0.99,
+    "failure_probability": 0.001,
+    "reward": 0.01,
+    "critic": 0.8,
+    "horizon": 80,
+    "true_value": 0.9099181073703321,
+    "results": {
+      "roulette": {
+        "mean": 0.9091679999999993,
+        "bias": -0.0007501073703327643,
+        "variance": 0.084694091769639,
+        "mse": 0.0846943721170668,
+        "mean_se": 0.0005313319482509309
+      },
+      "fixed_bootstrap": {
+        "mean": 0.8640142402154706,
+        "bias": -0.0459038671548615,
+        "variance": 0.02765452285669332,
+        "mse": 0.02976159569472163,
+        "mean_se": 0.0003036144641739659
+      },
+      "cross_error_0.8": {
+        "mean": 0.012112160199999862,
+        "truth": 0.01208199032787584,
+        "se": 0.00017412397058684713,
+        "negative_fraction": 0.16384
+      },
+      "cross_error_0.0": {
+        "mean": 0.827330720199999,
+        "truth": 0.8279509621204072,
+        "se": 0.0007004106865219164,
+        "negative_fraction": 0.0
+      }
+    },
+    "mean_effective_steps": {
+      "roulette": 90.64772,
+      "fixed": 76.87988333333334
+    },
+    "notes": "Scalar i.i.d. failure toy, exact geometric episode and independent roulette; no dynamics, robot or model training. Fixed and roulette share failure sample; cross error uses a second independent trajectory and roulette."
+  },
+  {
+    "seed": 9830,
+    "samples": 300000,
+    "gamma": 0.99,
+    "q": 0.99,
+    "failure_probability": 0.03,
+    "reward": 0.01,
+    "critic": 0.1,
+    "horizon": 80,
+    "true_value": 0.25188916876574263,
+    "results": {
+      "roulette": {
+        "mean": 0.25150128999999993,
+        "bias": -0.00038787876574269964,
+        "variance": 0.05132907567525481,
+        "mse": 0.051329055028272806,
+        "mean_se": 0.0004136386332507108
+      },
+      "fixed_bootstrap": {
+        "mean": 0.2457322499760347,
+        "bias": -0.006156918789707921,
+        "variance": 0.03159316087716294,
+        "mse": 0.03163096321560974,
+        "mean_se": 0.00032451584900773303
+      },
+      "cross_error_0.1": {
+        "mean": 0.02292628698,
+        "truth": 0.023070319588348244,
+        "se": 0.00012819582161791054,
+        "negative_fraction": 0.36687
+      },
+      "cross_error_0.0": {
+        "mean": 0.06326342998,
+        "truth": 0.06344815334149677,
+        "se": 0.00017360428141540883,
+        "negative_fraction": 0.0
+      }
+    },
+    "mean_effective_steps": {
+      "roulette": 25.138403333333333,
+      "fixed": 30.394136666666668
+    },
+    "notes": "Scalar i.i.d. failure toy, exact geometric episode and independent roulette; no dynamics, robot or model training. Fixed and roulette share failure sample; cross error uses a second independent trajectory and roulette."
+  },
+  {
+    "seed": 9830,
+    "samples": 300000,
+    "gamma": 0.99,
+    "q": 0.99,
+    "failure_probability": 0.03,
+    "reward": 0.01,
+    "critic": 0.8,
+    "horizon": 80,
+    "true_value": 0.25188916876574263,
+    "results": {
+      "roulette": {
+        "mean": 0.25232208666666656,
+        "bias": 0.0004329179009239237,
+        "variance": 0.11852685106968273,
+        "mse": 0.1185266433980881,
+        "mean_se": 0.0006285614556792431
+      },
+      "fixed_bootstrap": {
+        "mean": 0.2732610437730971,
+        "bias": 0.02137187500735449,
+        "variance": 0.058811828136287665,
+        "mse": 0.05926838913819054,
+        "mean_se": 0.00044276339857869787
+      },
+      "cross_error_0.8": {
+        "mean": 0.29963101425333355,
+        "truth": 0.3004254833163086,
+        "se": 0.0005326628576721293,
+        "negative_fraction": 0.37111666666666665
+      },
+      "cross_error_0.0": {
+        "mean": 0.06306080625333325,
+        "truth": 0.06344815334149677,
+        "se": 0.00030934198247144603,
+        "negative_fraction": 0.0
+      }
+    },
+    "mean_effective_steps": {
+      "roulette": 25.138403333333333,
+      "fixed": 30.394136666666668
+    },
+    "notes": "Scalar i.i.d. failure toy, exact geometric episode and independent roulette; no dynamics, robot or model training. Fixed and roulette share failure sample; cross error uses a second independent trajectory and roulette."
+  }
+]

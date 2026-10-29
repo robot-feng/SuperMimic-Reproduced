@@ -27,6 +27,8 @@ The headline checkpoint (100k iterations, 223 MB) is attached to the [GitHub rel
 
 Full per-experiment logs (configs, curves, checkpoints, failure breakdowns, dead ends) are in [`docs/EXPERIMENTS.md`](docs/EXPERIMENTS.md) (Chinese).
 
+Current algorithm-research conclusions, including negative results and limits, are summarized in [`docs/RESEARCH_RESULTS.md`](docs/RESEARCH_RESULTS.md).
+
 ## What is implemented
 
 Paper section → code. Everything is torch; nothing from rsl_rl.
@@ -134,6 +136,7 @@ The design documents are in Chinese; a full Chinese version of this README follo
 | [docs/REPRODUCTION_PLAN.md](docs/REPRODUCTION_PLAN.md) | Plan: goals, environment, design decisions D1–D20, repo skeleton, phased steps, tests, budget, risks |
 | [docs/REVIEW_LOG.md](docs/REVIEW_LOG.md) | Self-review and two adversarial reviews of the plan |
 | [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md) | Experiment log: configuration, curves, evaluation, decisions that deviated from the plan, pitfalls |
+| [docs/RESEARCH_RESULTS.md](docs/RESEARCH_RESULTS.md) | Algorithm findings, verified fixes, experimental limits, and next research priorities |
 
 ## Engineering notes
 
@@ -179,6 +182,8 @@ The design documents are in Chinese; a full Chinese version of this README follo
 
 每个实验的配置、曲线、评测、失败构成和踩坑见 [`docs/EXPERIMENTS.md`](docs/EXPERIMENTS.md)。
 
+当前算法研究结论、负结果和证据限制见 [`docs/RESEARCH_RESULTS.md`](docs/RESEARCH_RESULTS.md)。
+
 ## 实现内容
 
 论文章节 → 代码（全部 torch）：
@@ -215,6 +220,7 @@ The design documents are in Chinese; a full Chinese version of this README follo
 | [docs/REPRODUCTION_PLAN.md](docs/REPRODUCTION_PLAN.md) | 复现计划：目标、环境、设计决策 D1–D20、repo 骨架、分阶段步骤、测试、预算、风险 |
 | [docs/REVIEW_LOG.md](docs/REVIEW_LOG.md) | 计划的自审与两轮对抗审查记录 |
 | [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md) | 实验日志：每个实验的配置、曲线、评测、偏离计划的决定、踩坑记录 |
+| [docs/RESEARCH_RESULTS.md](docs/RESEARCH_RESULTS.md) | 算法发现、已验证修复、实验限制与下一步研究重点 |
 
 ## 工程备注
 

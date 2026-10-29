@@ -10,8 +10,10 @@ dist/
 /media/*.mp4
 wandb/
 *.npz
+*.npy
 *.pt
 *.onnx
+/docs/analysis/
 .pytest_cache/
 .ruff_cache/
 experiments/**/outputs/

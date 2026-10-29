@@ -1,0 +1,271 @@
+{
+  "seeds": [
+    8910,
+    8911,
+    8912
+  ],
+  "fit_seed": 8710,
+  "checkpoint_sha256": "daa70a13e451e15676f306a32e23d9b0c48f3bea3f504a088d966dc31dd18163",
+  "counted_simulator_transitions": 4950,
+  "results": {
+    "short": {
+      "count": 9,
+      "mean_reward_difference": 6.942751093043221e-05,
+      "canonical_better_count": 8,
+      "base_failures": 0,
+      "raw_failures": 0,
+      "canonical_failures": 0,
+      "by_seed": {
+        "8910": {
+          "count": 3,
+          "mean_reward_difference": 6.12090031305949e-05,
+          "gradient_cosine": 0.9993504740820082
+        },
+        "8911": {
+          "count": 3,
+          "mean_reward_difference": 0.00011412147432565689,
+          "gradient_cosine": 0.9949799256211246
+        },
+        "8912": {
+          "count": 3,
+          "mean_reward_difference": 3.295205533504486e-05,
+          "gradient_cosine": 0.9987607297477914
+        }
+      },
+      "rows": [
+        {
+          "seed": 8910,
+          "clip": "dance2_subject1",
+          "frame": 8104,
+          "canonical_minus_raw_reward": 5.40614128112793e-05,
+          "raw_delta_vs_base": 0.0031603574752807617,
+          "canonical_delta_vs_base": 0.003214418888092041,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        },
+        {
+          "seed": 8910,
+          "clip": "jumps1_subject2",
+          "frame": 32418,
+          "canonical_minus_raw_reward": 1.1354684829711914e-05,
+          "raw_delta_vs_base": -0.0003306567668914795,
+          "canonical_delta_vs_base": -0.0003193020820617676,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        },
+        {
+          "seed": 8910,
+          "clip": "walk2_subject1",
+          "frame": 58905,
+          "canonical_minus_raw_reward": 0.00011821091175079346,
+          "raw_delta_vs_base": 0.009061112999916077,
+          "canonical_delta_vs_base": 0.00917932391166687,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        },
+        {
+          "seed": 8911,
+          "clip": "dance2_subject1",
+          "frame": 12936,
+          "canonical_minus_raw_reward": 7.748603820800781e-06,
+          "raw_delta_vs_base": 0.0002729743719100952,
+          "canonical_delta_vs_base": 0.000280722975730896,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        },
+        {
+          "seed": 8911,
+          "clip": "jumps1_subject2",
+          "frame": 34682,
+          "canonical_minus_raw_reward": 0.00015294551849365234,
+          "raw_delta_vs_base": 0.0021041035652160645,
+          "canonical_delta_vs_base": 0.002257049083709717,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        },
+        {
+          "seed": 8911,
+          "clip": "walk2_subject1",
+          "frame": 60561,
+          "canonical_minus_raw_reward": 0.00018167030066251755,
+          "raw_delta_vs_base": 0.005073621869087219,
+          "canonical_delta_vs_base": 0.005255292169749737,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        },
+        {
+          "seed": 8912,
+          "clip": "dance2_subject1",
+          "frame": 11014,
+          "canonical_minus_raw_reward": 3.212876617908478e-05,
+          "raw_delta_vs_base": 0.0026747938245534897,
+          "canonical_delta_vs_base": 0.0027069225907325745,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        },
+        {
+          "seed": 8912,
+          "clip": "jumps1_subject2",
+          "frame": 32650,
+          "canonical_minus_raw_reward": 7.463991641998291e-05,
+          "raw_delta_vs_base": 0.01114385575056076,
+          "canonical_delta_vs_base": 0.011218495666980743,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        },
+        {
+          "seed": 8912,
+          "clip": "walk2_subject1",
+          "frame": 58680,
+          "canonical_minus_raw_reward": -7.912516593933105e-06,
+          "raw_delta_vs_base": 0.002976730465888977,
+          "canonical_delta_vs_base": 0.002968817949295044,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        }
+      ]
+    },
+    "long": {
+      "count": 9,
+      "mean_reward_difference": 0.014384532968203226,
+      "canonical_better_count": 4,
+      "base_failures": 2,
+      "raw_failures": 2,
+      "canonical_failures": 2,
+      "by_seed": {
+        "8910": {
+          "count": 3,
+          "mean_reward_difference": 0.0024941364924112954,
+          "gradient_cosine": 0.9993504740820082
+        },
+        "8911": {
+          "count": 3,
+          "mean_reward_difference": 0.022358253598213196,
+          "gradient_cosine": 0.9949799256211246
+        },
+        "8912": {
+          "count": 3,
+          "mean_reward_difference": 0.018301208813985188,
+          "gradient_cosine": 0.9987607297477914
+        }
+      },
+      "rows": [
+        {
+          "seed": 8910,
+          "clip": "dance2_subject1",
+          "frame": 8104,
+          "canonical_minus_raw_reward": -0.005106210708618164,
+          "raw_delta_vs_base": 0.061600446701049805,
+          "canonical_delta_vs_base": 0.05649423599243164,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        },
+        {
+          "seed": 8910,
+          "clip": "jumps1_subject2",
+          "frame": 32418,
+          "canonical_minus_raw_reward": 0.029863953590393066,
+          "raw_delta_vs_base": -0.032839179039001465,
+          "canonical_delta_vs_base": -0.0029752254486083984,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        },
+        {
+          "seed": 8910,
+          "clip": "walk2_subject1",
+          "frame": 58905,
+          "canonical_minus_raw_reward": -0.017275333404541016,
+          "raw_delta_vs_base": -0.08406376838684082,
+          "canonical_delta_vs_base": -0.10133910179138184,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        },
+        {
+          "seed": 8911,
+          "clip": "dance2_subject1",
+          "frame": 12936,
+          "canonical_minus_raw_reward": -0.0005410760641098022,
+          "raw_delta_vs_base": 0.015437453985214233,
+          "canonical_delta_vs_base": 0.014896377921104431,
+          "base_failed": true,
+          "raw_failed": true,
+          "canonical_failed": true
+        },
+        {
+          "seed": 8911,
+          "clip": "jumps1_subject2",
+          "frame": 34682,
+          "canonical_minus_raw_reward": 0.0004901885986328125,
+          "raw_delta_vs_base": -0.048707008361816406,
+          "canonical_delta_vs_base": -0.048216819763183594,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        },
+        {
+          "seed": 8911,
+          "clip": "walk2_subject1",
+          "frame": 60561,
+          "canonical_minus_raw_reward": 0.06712564826011658,
+          "raw_delta_vs_base": -0.0376071035861969,
+          "canonical_delta_vs_base": 0.029518544673919678,
+          "base_failed": true,
+          "raw_failed": true,
+          "canonical_failed": true
+        },
+        {
+          "seed": 8912,
+          "clip": "dance2_subject1",
+          "frame": 11014,
+          "canonical_minus_raw_reward": -0.0012856721878051758,
+          "raw_delta_vs_base": -0.010605096817016602,
+          "canonical_delta_vs_base": -0.011890769004821777,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        },
+        {
+          "seed": 8912,
+          "clip": "jumps1_subject2",
+          "frame": 32650,
+          "canonical_minus_raw_reward": -0.0022361278533935547,
+          "raw_delta_vs_base": 0.06575131416320801,
+          "canonical_delta_vs_base": 0.06351518630981445,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        },
+        {
+          "seed": 8912,
+          "clip": "walk2_subject1",
+          "frame": 58680,
+          "canonical_minus_raw_reward": 0.0584254264831543,
+          "raw_delta_vs_base": 0.047118961811065674,
+          "canonical_delta_vs_base": 0.10554438829421997,
+          "base_failed": false,
+          "raw_failed": false,
+          "canonical_failed": false
+        }
+      ]
+    }
+  },
+  "notes": "Same pretrained checkpoint and single pair of model fits. Three seeds change starting frames and action noise, not model training. Finite unit-norm direction perturbation; actual 80-step reward truncated; no multiround policy training.",
+  "inputs": [
+    "docs\\analysis\\g1_bias_actor_direction_8910.json",
+    "docs\\analysis\\g1_bias_actor_direction_8911.json",
+    "docs\\analysis\\g1_bias_actor_direction_8912.json"
+  ],
+  "weights_note": "Weight hashes were checked on the server before and after rollout; weight files remain on server."
+}

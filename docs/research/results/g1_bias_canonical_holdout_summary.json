@@ -1,0 +1,144 @@
+{
+  "seeds": [
+    8620,
+    8621,
+    8622
+  ],
+  "checkpoint_sha256": "daa70a13e451e15676f306a32e23d9b0c48f3bea3f504a088d966dc31dd18163",
+  "model_script_sha256": "2cecb9b5d7ae01b96b9f9485e27f8e188ec2296acd1cb25902fe7fd4ab5b37be",
+  "scale_probe_sha256": "695424e5206305ef78c9bc3fe8be6f48733a7d37ed04de49f661d0c368ffd49c",
+  "summary": {
+    "1": {
+      "base_mean": 0.07080245315349505,
+      "canonical_mean": 0.07103005745617945,
+      "mean_delta": 0.00022760430268438844,
+      "seed_standard_error": 0.0004471777405615007,
+      "better_seed_count": 1,
+      "seeds": [
+        {
+          "seed": 8620,
+          "base_mean": 0.07897172156481247,
+          "canonical_mean": 0.07912984927315847,
+          "delta": 0.00015812770834600087,
+          "lower_windows": 58
+        },
+        {
+          "seed": 8621,
+          "base_mean": 0.06845496596542944,
+          "canonical_mean": 0.0694895025480946,
+          "delta": 0.0010345365826651687,
+          "lower_windows": 49
+        },
+        {
+          "seed": 8622,
+          "base_mean": 0.06498067193024326,
+          "canonical_mean": 0.06447082054728526,
+          "delta": -0.0005098513829580043,
+          "lower_windows": 66
+        }
+      ]
+    },
+    "8": {
+      "base_mean": 0.1870080197841162,
+      "canonical_mean": 0.18446839092939626,
+      "mean_delta": -0.002539628854719922,
+      "seed_standard_error": 0.0004343849752541602,
+      "better_seed_count": 3,
+      "seeds": [
+        {
+          "seed": 8620,
+          "base_mean": 0.19457480951678008,
+          "canonical_mean": 0.1921988220565254,
+          "delta": -0.0023759874602546915,
+          "lower_windows": 89
+        },
+        {
+          "seed": 8621,
+          "base_mean": 0.16770641697803512,
+          "canonical_mean": 0.16434605806716718,
+          "delta": -0.0033603589108679444,
+          "lower_windows": 81
+        },
+        {
+          "seed": 8622,
+          "base_mean": 0.19874283285753336,
+          "canonical_mean": 0.19686029266449623,
+          "delta": -0.00188254019303713,
+          "lower_windows": 83
+        }
+      ]
+    },
+    "16": {
+      "base_mean": 0.3768507045557878,
+      "canonical_mean": 0.368633032553286,
+      "mean_delta": -0.008217672002501786,
+      "seed_standard_error": 0.005732801754774061,
+      "better_seed_count": 2,
+      "seeds": [
+        {
+          "seed": 8620,
+          "base_mean": 0.3990834610303864,
+          "canonical_mean": 0.3881785038684029,
+          "delta": -0.010904957161983475,
+          "lower_windows": 90
+        },
+        {
+          "seed": 8621,
+          "base_mean": 0.34175675018923357,
+          "canonical_mean": 0.32522979780333117,
+          "delta": -0.016526952385902405,
+          "lower_windows": 83
+        },
+        {
+          "seed": 8622,
+          "base_mean": 0.38971190244774334,
+          "canonical_mean": 0.39249079598812386,
+          "delta": 0.0027788935403805226,
+          "lower_windows": 75
+        }
+      ]
+    },
+    "32": {
+      "base_mean": 1.2045837339149632,
+      "canonical_mean": 1.1655201907560695,
+      "mean_delta": -0.039063543158893786,
+      "seed_standard_error": 0.015623164898105663,
+      "better_seed_count": 3,
+      "seeds": [
+        {
+          "seed": 8620,
+          "base_mean": 1.236719043488847,
+          "canonical_mean": 1.2061155194824096,
+          "delta": -0.03060352400643751,
+          "lower_windows": 91
+        },
+        {
+          "seed": 8621,
+          "base_mean": 1.1027578312787227,
+          "canonical_mean": 1.0334148850524798,
+          "delta": -0.06934294622624293,
+          "lower_windows": 80
+        },
+        {
+          "seed": 8622,
+          "base_mean": 1.27427432697732,
+          "canonical_mean": 1.257030167733319,
+          "delta": -0.01724415924400091,
+          "lower_windows": 67
+        }
+      ]
+    }
+  },
+  "new_sim_transitions": 5760,
+  "notes": "Same pretrained checkpoint; three correlated window sets sampled with replacement. Seed SE is descriptive, not a generalization confidence bound. Open-loop fixed actions only.",
+  "eval_paths": [
+    "docs\\analysis\\g1_bias_canonical_eval_seed8620.json",
+    "docs\\analysis\\g1_bias_canonical_eval_seed8621.json",
+    "docs\\analysis\\g1_bias_canonical_eval_seed8622.json"
+  ],
+  "report_paths": [
+    "docs\\analysis\\g1_bias_holdout_windows_8620.json",
+    "docs\\analysis\\g1_bias_holdout_windows_8621.json",
+    "docs\\analysis\\g1_bias_holdout_windows_8622.json"
+  ]
+}

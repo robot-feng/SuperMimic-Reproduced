@@ -48,11 +48,13 @@ class PolicyTrainer:
 
         self.step_fn = ImagStep(wm, lib.default_joint_pos, compile_mode=cfg.compile)
 
-    def set_lr(self, lr: float) -> None:
+    def set_lr(self, lr: float, critic_lr: float | None = None) -> None:
+        if critic_lr is None:
+            critic_lr = lr  # Preserve the original one-argument interface.
         for g in self.opt.param_groups:
             g["lr"] = lr
         for g in self.critic_opt.param_groups:
-            g["lr"] = lr
+            g["lr"] = critic_lr
 
     def _critic_inputs(self, ro: ImagRollout):
         H1, n, _ = ro.states.shape
@@ -122,6 +124,8 @@ class PolicyTrainer:
                 X_xi = xi_rep[:-1].reshape(-1, xi_rep.shape[-1])
                 X_er = e_root_d[:-1].reshape(-1, 4)
                 Y = targets.reshape(-1)
+                target_std = targets.std(unbiased=False)
+                preupdate_rmse = (values[:-1] - targets).square().mean().sqrt()
             N = Y.shape[0]
             mb = N // cfg.critic_minibatches
             last = torch.zeros((), device=Y.device)
@@ -140,6 +144,10 @@ class PolicyTrainer:
             metric_tensors["critic_loss"] = last.detach()
             metric_tensors["critic_value_mean"] = values.mean().detach()
             metric_tensors["critic_target_mean"] = targets.mean().detach()
+            metric_tensors["critic_target_std"] = target_std.detach()
+            metric_tensors["critic_preupdate_nrmse"] = (
+                preupdate_rmse / target_std.clamp_min(1e-8)
+            ).detach()
         if profile:
             torch.cuda.synchronize()
             critic_s = time.perf_counter() - t_phase

@@ -3,7 +3,8 @@
 Each row holds the state ``s_t`` at the start of a control step together with the
 transition that followed it: clean action ``a_t``, executed action ``a_exec_t``, sim
 context ``xi_t``, reward ``r_{t+1}``, the target frame/clip of that step and bookkeeping
-flags. When an episode ends an extra *terminal* row is written that holds ``s_{T+1}``
+flags. The transition row's ``done`` is the termination label of ``s_{t+1}``.
+When an episode ends an extra *terminal* row is written that holds ``s_{T+1}``
 (no transition out of it) and the termination label of that state, so k-step windows
 can use it as their last target state and the termination head gets positive labels.
 """
@@ -141,7 +142,10 @@ class ReplayBuffer:
             a_clean=self.a[ee[:-1], tt[:-1]],
             xi=self.xi[e, t],
             reward=self.r[ee[:-1], tt[:-1]],
-            done=self.done[ee[1:], tt[1:]],
+            # done is stored on the transition row as the label for its next
+            # state. Indexing the following row shifts the final termination
+            # one step earlier because the final transition also stores done=1.
+            done=self.done[ee[:-1], tt[:-1]],
             frame=self.frame[ee[:-1], tt[:-1]],
         )
 

@@ -1,0 +1,85 @@
+{
+  "run_name": "research-lr-smoke-4711",
+  "device": "cpu",
+  "seed": 4711,
+  "clips": [
+    "walk1_subject1"
+  ],
+  "envs": 8,
+  "iterations": 16,
+  "updates": 2,
+  "world_hidden": [
+    64,
+    64
+  ],
+  "actor_hidden": [
+    64,
+    32
+  ],
+  "critic_hidden": [
+    32,
+    16
+  ],
+  "initial_lrs": {
+    "world_model": 0.0002,
+    "actor": 0.0002,
+    "critic": 5e-05
+  },
+  "actual_final_lrs": {
+    "world_model": 6e-06,
+    "actor": 6e-06,
+    "critic": 1.5e-06
+  },
+  "expected_final_lrs": {
+    "world_model": 6e-06,
+    "actor": 6e-06,
+    "critic": 1.5e-06
+  },
+  "environment_transitions": 128,
+  "checkpoint": "logs\\research-lr-smoke-4711\\ckpt_latest.pt",
+  "event": "logs\\research-lr-smoke-4711\\tb\\events.out.tfevents.1793222201.DESKTOP-EK4PU16.37832.0",
+  "event_records": [
+    {
+      "step": 14,
+      "tag": "wm/loss",
+      "value": 219.66392517089844
+    },
+    {
+      "step": 14,
+      "tag": "policy/critic_loss",
+      "value": 0.0019253584323450923
+    },
+    {
+      "step": 14,
+      "tag": "learning_rate/actor",
+      "value": 6.000000212225132e-06
+    },
+    {
+      "step": 14,
+      "tag": "learning_rate/critic",
+      "value": 1.500000053056283e-06
+    },
+    {
+      "step": 16,
+      "tag": "wm/loss",
+      "value": 117.60999298095703
+    },
+    {
+      "step": 16,
+      "tag": "policy/critic_loss",
+      "value": 0.0019563573878258467
+    },
+    {
+      "step": 16,
+      "tag": "learning_rate/actor",
+      "value": 6.000000212225132e-06
+    },
+    {
+      "step": 16,
+      "tag": "learning_rate/critic",
+      "value": 1.500000053056283e-06
+    }
+  ],
+  "wall_seconds": 5.694411700009368,
+  "notes": "Tiny networks, 8 CPU G1 envs, H=4, two optimizer updates, no resume and one clip. Pipeline smoke only; not meaningful G1 performance or algorithm comparison."
+}

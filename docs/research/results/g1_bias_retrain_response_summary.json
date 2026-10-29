@@ -1,0 +1,252 @@
+{
+  "seeds": [
+    8810,
+    8811,
+    8812
+  ],
+  "fit_seed": 8710,
+  "checkpoint_sha256": "daa70a13e451e15676f306a32e23d9b0c48f3bea3f504a088d966dc31dd18163",
+  "source_models": {
+    "raw": {
+      "report": "docs/analysis/g1_bias_retrain_confirm_raw_8710.json",
+      "report_sha256": "a001ea365ab77b7f2a199d925d888ddeb25437c3b89c9d31c077f65d1b74c427",
+      "weight": "docs/analysis/g1_bias_retrain_confirm_raw_8710.pt",
+      "weight_sha256": "f9ee60bf7ff88e61291d6f0cb9ea9a0c6df9b5b5f98a7574d7dc1a8b0c9c1f16"
+    },
+    "canonical": {
+      "report": "docs/analysis/g1_bias_retrain_confirm_canonical_8710.json",
+      "report_sha256": "0db17719fd430cb13554e3785bef1194b602da54ad7ba347001fdb5f5e8c669d",
+      "weight": "docs/analysis/g1_bias_retrain_confirm_canonical_8710.pt",
+      "weight_sha256": "1c5d95c74219fb1937633cecc42bb2942697a9d16a16e968401786cf3528c914"
+    },
+    "augment": {
+      "report": "docs/analysis/g1_bias_retrain_confirm_augment_8710.json",
+      "report_sha256": "be8aed060cbb52e55865f91df3afd40a15f05255c9e4f1005d46ca0a981e8b34",
+      "weight": "docs/analysis/g1_bias_retrain_confirm_augment_8710.pt",
+      "weight_sha256": "2e0e484e1a674c2bb1a9b452e621762a71103df37101254348932a8f77f0a8f9"
+    }
+  },
+  "simulator_transitions": 1584,
+  "results": {
+    "0.05": {
+      "valid_count": 36,
+      "seed_means": {
+        "8810": {
+          "original": {
+            "response_mse": 0.00440806987171527,
+            "forward_nse": 0.04628702291908363
+          },
+          "raw": {
+            "response_mse": 0.00442519295514406,
+            "forward_nse": 0.04315280925948173
+          },
+          "raw_canonical": {
+            "response_mse": 0.0044362558401189744,
+            "forward_nse": 0.043156498519238085
+          },
+          "canonical": {
+            "response_mse": 0.004430316466217239,
+            "forward_nse": 0.042505162535235286
+          },
+          "augment": {
+            "response_mse": 0.004438480696990155,
+            "forward_nse": 0.042702259961515665
+          }
+        },
+        "8811": {
+          "original": {
+            "response_mse": 0.008738435125754526,
+            "forward_nse": 0.052611020005618535
+          },
+          "raw": {
+            "response_mse": 0.008584340296996137,
+            "forward_nse": 0.05648364770847062
+          },
+          "raw_canonical": {
+            "response_mse": 0.008701563318027183,
+            "forward_nse": 0.05567551640948901
+          },
+          "canonical": {
+            "response_mse": 0.008734349229295427,
+            "forward_nse": 0.055363555011960365
+          },
+          "augment": {
+            "response_mse": 0.008585738076362759,
+            "forward_nse": 0.05654168893427899
+          }
+        },
+        "8812": {
+          "original": {
+            "response_mse": 0.005214729404542595,
+            "forward_nse": 0.05246588595521947
+          },
+          "raw": {
+            "response_mse": 0.005183709882354985,
+            "forward_nse": 0.05701995547860861
+          },
+          "raw_canonical": {
+            "response_mse": 0.005129635149690633,
+            "forward_nse": 0.05884284033284833
+          },
+          "canonical": {
+            "response_mse": 0.0051591066003311425,
+            "forward_nse": 0.057458814311151706
+          },
+          "augment": {
+            "response_mse": 0.0052052762572808815,
+            "forward_nse": 0.057879428224017225
+          }
+        }
+      },
+      "comparisons": {
+        "canonical_vs_raw": {
+          "response_better_count": 17,
+          "forward_better_count": 22
+        },
+        "canonical_vs_raw_canonical": {
+          "response_better_count": 17,
+          "forward_better_count": 28
+        },
+        "augment_vs_raw": {
+          "response_better_count": 17,
+          "forward_better_count": 15
+        }
+      },
+      "means": {
+        "original": {
+          "response_mse": 0.006120411467337463,
+          "forward_nse": 0.05045464295997388
+        },
+        "raw": {
+          "response_mse": 0.006064414378165061,
+          "forward_nse": 0.05221880414885365
+        },
+        "raw_canonical": {
+          "response_mse": 0.006089151435945597,
+          "forward_nse": 0.05255828508719181
+        },
+        "canonical": {
+          "response_mse": 0.006107924098614603,
+          "forward_nse": 0.05177584395278245
+        },
+        "augment": {
+          "response_mse": 0.006076498343544599,
+          "forward_nse": 0.05237445903993729
+        }
+      }
+    },
+    "0.2": {
+      "valid_count": 36,
+      "seed_means": {
+        "8810": {
+          "original": {
+            "response_mse": 0.0038809621861825385,
+            "forward_nse": 0.046321012234936156
+          },
+          "raw": {
+            "response_mse": 0.003901989635778591,
+            "forward_nse": 0.04321939090732485
+          },
+          "raw_canonical": {
+            "response_mse": 0.003936822574663286,
+            "forward_nse": 0.04319009332296749
+          },
+          "canonical": {
+            "response_mse": 0.003924128764386599,
+            "forward_nse": 0.042542573840667806
+          },
+          "augment": {
+            "response_mse": 0.0039181168540380895,
+            "forward_nse": 0.04277717194054276
+          }
+        },
+        "8811": {
+          "original": {
+            "response_mse": 0.0036218858537419387,
+            "forward_nse": 0.05271633970551193
+          },
+          "raw": {
+            "response_mse": 0.0035274566519850246,
+            "forward_nse": 0.05658746363284687
+          },
+          "raw_canonical": {
+            "response_mse": 0.003523498346718649,
+            "forward_nse": 0.055779501252497234
+          },
+          "canonical": {
+            "response_mse": 0.0035457773095307252,
+            "forward_nse": 0.05546873086132109
+          },
+          "augment": {
+            "response_mse": 0.0035188394346429655,
+            "forward_nse": 0.056642509143178664
+          }
+        },
+        "8812": {
+          "original": {
+            "response_mse": 0.005197309258316333,
+            "forward_nse": 0.05264065146911889
+          },
+          "raw": {
+            "response_mse": 0.00516500982727545,
+            "forward_nse": 0.05718759594795605
+          },
+          "raw_canonical": {
+            "response_mse": 0.005108201653153325,
+            "forward_nse": 0.059000010563371084
+          },
+          "canonical": {
+            "response_mse": 0.005137052668336158,
+            "forward_nse": 0.0576192089356482
+          },
+          "augment": {
+            "response_mse": 0.005186585272895172,
+            "forward_nse": 0.058047167801608644
+          }
+        }
+      },
+      "comparisons": {
+        "canonical_vs_raw": {
+          "response_better_count": 16,
+          "forward_better_count": 22
+        },
+        "canonical_vs_raw_canonical": {
+          "response_better_count": 17,
+          "forward_better_count": 28
+        },
+        "augment_vs_raw": {
+          "response_better_count": 15,
+          "forward_better_count": 15
+        }
+      },
+      "means": {
+        "original": {
+          "response_mse": 0.0042333857660802705,
+          "forward_nse": 0.05055933446985566
+        },
+        "raw": {
+          "response_mse": 0.004198152038346355,
+          "forward_nse": 0.05233148349604259
+        },
+        "raw_canonical": {
+          "response_mse": 0.004189507524845087,
+          "forward_nse": 0.0526565350462786
+        },
+        "canonical": {
+          "response_mse": 0.004202319580751161,
+          "forward_nse": 0.051876837879212365
+        },
+        "augment": {
+          "response_mse": 0.004207847187192076,
+          "forward_nse": 0.05248894962844335
+        }
+      }
+    }
+  },
+  "notes": "Paired one-step finite action response. Same underlying model fit and same checkpoint across collection seeds; amplitudes share starts and no complete training comparison. Per-start observations correlated; excluded reset pairs.",
+  "inputs": [
+    "docs\\analysis\\g1_bias_retrain_response_8810.json",
+    "docs\\analysis\\g1_bias_retrain_response_8811.json",
+    "docs\\analysis\\g1_bias_retrain_response_8812.json"
+  ]
+}
